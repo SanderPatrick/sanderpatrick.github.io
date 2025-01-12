@@ -4,16 +4,26 @@
 <body>
 
 <h1>SCRGer Running Summary</h1>
-<form action="">
+<!-- <form action="">
   <label for="fClientId">ClientId:</label>
   <input type="text" id="fclient_id" name="fclient_id"><br><br>
   <label for="lname">ClientSecretId:</label>
   <input type="text" id="fclient_secret" name="fclient_secret"><br><br>
-  <input type="submit" value="Sync Actitivies">
-</form>
-
+  onclick="CapacityChart();"
+</form>!-->
+<input type="submit" value="Sync Actitivies" onclick="fetchAthleteInformation();">
 <script src="https://apis.google.com/js/api.js"></script>
 <script>
+
+function fetchAthleteInformation(){
+	console.log("Starting get ClientID & SecretId...");
+	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0
+	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2
+	const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
+	const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
+	gSheetsURL = link1;
+	fetch(gSheetsURL).then(res => console.log(res.text()))
+}
 //1. Authorize to get code
 var clientId ='144506'//'144906'
 var clientSecret ='bfc9734e06f811f73a09874f17bfc3680c655073'//'779aac7c5d65c3492a27047a191009118de05be6'
