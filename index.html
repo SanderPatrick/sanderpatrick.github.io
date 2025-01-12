@@ -21,7 +21,7 @@ function fetchAthleteInformation(){
 	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2
 	const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
 	const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
-	gSheetsURL = link1;
+	gSheetsURL = link2;
 	fetch(gSheetsURL).then(res => console.log(res.text()))
 }
 //1. Authorize to get code
