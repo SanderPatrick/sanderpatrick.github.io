@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<h1>SCRGer Running Summary</h1>
+<form action="">
+  <label for="fClientId">ClientId:</label>
+  <input type="text" id="fclient_id" name="fclient_id"><br><br>
+  <label for="lname">ClientSecretId:</label>
+  <input type="text" id="fclient_secret" name="fclient_secret"><br><br>
+  <input type="submit" value="Sync Actitivies">
+</form>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+//1. Authorize to get code
+var clientId ='144506'//'144906'
+var clientSecret ='bfc9734e06f811f73a09874f17bfc3680c655073'//'779aac7c5d65c3492a27047a191009118de05be6'
+const  auth_app_link ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=http://localhost/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
+//console.log(auth_app_link)
+//window.location.replace(auth_app_link)
+var returned_code ='34a2b2704d3d0f61d956bfa0c5af5a59fb0b6d24'//"83351f29cd2ef28c17d58b4f2e12418bacda6d1e" // obtaining from above redirect_uri http://localhost/exchange_token?state=&code=762d43d87868ec8265b2b406cd8f2e9386100aab&scope=read,activity:write,activity:read_all,profile:read_all,read_all
+var exchanged_accessToken="";
+var exchanged_refreshToken="b338caf77f29c616dba12213dde4c14c3dbfec56";
+// exchange_token to get access_token
+
+const  auth_exchange_for_accessToken_link = "https://www.strava.com/oauth/token"
+//?client_id=144906&client_secret=5a0e54a5a4d2ef1b2a56b8a7da42f39856498ee7&code=fa28fe3cda19ec4aa51eff7fff8002233d55cdc3&grant_type=authorization_code"
+
+var defaultBefore;
+var defaultAfter;
+
+async function   exchange_auth_for_access_token(){
+	try{
+		//2024-12-25T14:43:46Z
+		//console.log(Date.parse("2024-12-25T14:43:46Z"));
+		defaultBefore = convertEpoch(2025,1,11,23,59,59); //1735145999;//
+		defaultAfter = convertEpoch(2024,12,01,00,00,00);//1735059600;//
+		const response = await fetch(auth_exchange_for_accessToken_link,{
+			method: 'post',
+			headers: {
+				'Accept': 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+
+			},
+
+			body: JSON.stringify({
+
+				client_id: clientId,
+				client_secret: clientSecret,
+				code: returned_code,
+				grant_type: 'authorization_code'
+			})
+		}).then(res => res.json()).then(res => execute_auth(res)) 
+	   
+		
+	}catch(error){
+		console.log(error.message);
+	}
+	
+	
+}
+function execute_auth(res){
+	if(res["access_token"]){
+		//if(res["access_token"]!="undefined"){
+					exchanged_accessToken = res["access_token"];
+					exchanged_refreshToken = res["refresh_token"];
+					console.log(exchanged_accessToken+'\n');
+					console.log(exchanged_refreshToken);
+		//}else{
+		//			reAuthorize();
+		//}
+				
+				//console.log("Success:", response.json());
+			
+				//var exchanged_accessToken = response["access_token"];
+				//var exchanged_refreshToken = response["refresh_token"];
+				//console.log(exchanged_accessToken+'\n');
+				//console.log(exchanged_refreshToken);
+				reAuthorize();
+	}
+	else{
+		//console.log(res.status);
+		reAuthorize();
+	}
+}
+exchange_auth_for_access_token()
+
+
+
+const auth_link = "https://www.strava.com/oauth/token"
+
+function getActivites(res){
+	var lastAccesToken ="a8286b988a8becb5176355a0b199d468f2d40d4c";
+	if(!res.errors)
+      exchanged_accessToken=res.access_token;//"a8286b988a8becb5176355a0b199d468f2d40d4c";
+	else
+	  exchanged_accessToken=lastAccesToken;
+    //const activities_link = "https://www.strava.com/api/v3/athlete/activities?before=1736546425&after=1736373625&page=1&per_page=100&access_token=e09d2aa33b6574ffcbf85baf74a7bcc2455d549b";
+	const activities_link = "https://www.strava.com/api/v3/athlete/activities?before="+defaultBefore+"&after="+defaultAfter+"&page=1&per_page=200&access_token="+exchanged_accessToken;
+	
+	console.log(activities_link);
+    
+	fetch(activities_link).then(res => res.json())
+		.then((data) => show_recorded_activities(data)
+		)
+}
+
+function show_recorded_activities(data){
+	
+	try{
+		var iCount=1;
+		var dataCum = "<table border='1'><thead><tr><th>No</th><th>Athlete Id</th> <th>Activity Id</th><th>Distance (m)</th><th>moving_time(s)</th><th>Average_speed(m/s)</th><th>start_date_local</th></tr></thead><tbody>";
+		for (const element of data) { // You can use `let` instead of `const` if you like
+			dataCum = dataCum+ "<tr><td>"+iCount+" </td><td> "+element["athlete"]["id"]+"</td> <td>"+element["id"]+"</td> <td>"+element["distance"]+"</td> <td>"+element["moving_time"]+"</td> <td>"+element["average_speed"]+"</td> <td>"+element["start_date_local"]+"</td></tr>";
+            iCount++;
+		}
+		//console.log(dataCum);
+		dataCum=dataCum+"</tbody></table>";
+		document.getElementById('showDiv').innerHTML = dataCum;
+		console.log(data);
+	}catch(err){
+		console.log(err.message+"  aaaaaaaaaaaaaaaa");
+	}
+
+}
+
+function reAuthorize(){
+    fetch(auth_link,{
+        method: 'post',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+
+        },
+
+        body: JSON.stringify({
+
+            client_id: clientId,
+		    client_secret: clientSecret,
+            refresh_token: exchanged_refreshToken,//'b338caf77f29c616dba12213dde4c14c3dbfec56',
+            grant_type: 'refresh_token'
+        })
+    }).then(res => res.json())
+        .then(res => getActivites(res))  
+}
+
+//reAuthorize()
+
+//Sy
+
+const authorizeLink ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=index.html/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
+//console.log(authorizeLink)
+//window.location.replace(authorizeLink);
+
+
+function convertEpoch(iYear,iMoth,iDay,iHour,iMinute,iSecond){
+	var epochVal=iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond;
+	var inputDate = new Date(iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond+"").toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+	//console.log(inputDate);
+	
+    epochVal = Date.parse(inputDate)/1000;//= Math.floor(inputDate / 1000);
+	console.log(epochVal);
+	return epochVal;
+}
+
+</script>
+
+<div id="showDiv"></>
+</body>
+
+</html>
