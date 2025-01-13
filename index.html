@@ -61,7 +61,7 @@ async function   exchange_auth_for_access_token(){
 	try{
 		//2024-12-25T14:43:46Z
 		//console.log(Date.parse("2024-12-25T14:43:46Z"));
-		defaultBefore = convertEpoch(2025,1,11,23,59,59); //1735145999;//
+		defaultBefore = convertEpoch(2025,1,13,23,59,59); //1735145999;//
 		defaultAfter = convertEpoch(2024,12,01,00,00,00);//1735059600;//
 		const response = await fetch(auth_exchange_for_accessToken_link,{
 			method: 'post',
