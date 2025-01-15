@@ -26,7 +26,10 @@ function fetchAthleteInformation(){
 	const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
 	const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
 	gSheetsURL = link2;
-	fetch(gSheetsURL).then(res => console.log(res.text()));
+	fetch(gSheetsURL).then(res => console.log(res.rows)
+			      
+			      
+			      );
 	
 	f_SyncInfo();
 	f_fetch_recorded_activities_by_range();
