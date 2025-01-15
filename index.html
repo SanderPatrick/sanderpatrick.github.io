@@ -10,8 +10,9 @@
   <label for="lname">ClientSecretId:</label>
   <input type="text" id="fclient_secret" name="fclient_secret"><br><br>
   onclick="CapacityChart();"
-</form>!
-<input type="submit" value="Sync Actitivies" onclick="fetchAthleteInformation();">-->
+</form>!-->
+
+Client ID: <input type="text" value="144906" /> <input type="submit" value="Search" onclick="fetchAthleteInformation();">
 <a href="#">1.Sander Nguyen </a> | <a href="#" >2.Tommy Hoang </a> | <a href="#">3.Pepsi Nguyen</a> | <a href="#">4.Cindy Doan </a> | <a href="#">5.Ricky Nguyen</a>
 </br>
 <a href="#">6.Anna Nguyen </a> | <a href="#" >7.Jenny Nguyen </a>	
@@ -26,15 +27,17 @@ function fetchAthleteInformation(){
 	const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
 	gSheetsURL = link2;
 	fetch(gSheetsURL).then(res => console.log(res.text()));
+	
 	f_SyncInfo();
 	f_fetch_recorded_activities_by_range();
 }
 
 function f_SyncInfo(){
-	clientId='144906';
-	clientSecret ='779aac7c5d65c3492a27047a191009118de05be6';
-	returned_code ='370bc62cf3882b49826cddb031e9828a8ab13e0c';
-	exchanged_refreshToken="78d8de4983b2cbd8c3b03b507f468cb136a43375";
+	clientId='145417';//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
+	//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
+	clientSecret ='800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
+	returned_code ='837a3437b85f3d83962bfc7303b16f4de5bd42f3';
+	exchanged_refreshToken="a1ec96317f305c472315e303cafb024c0d096623";
 	exchanged_accessToken="";
 }
 
@@ -64,8 +67,30 @@ async function   exchange_auth_for_access_token(){
 	try{
 		//2024-12-25T14:43:46Z
 		//console.log(Date.parse("2024-12-25T14:43:46Z"));
-		defaultBefore = convertEpoch(2025,1,13,23,59,59); //1735145999;//
-		defaultAfter = convertEpoch(2024,12,01,00,00,00);//1735059600;//
+	   var currentdate = new Date(); 
+       var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+		console.log(datetime);
+		var beforeYear = currentdate.getFullYear();
+		var beforeMonth = currentdate.getMonth()+1;
+		var beforeDay = currentdate.getDate();
+		var beforeHrs = 23;
+		var beforeMin = 59;
+		var beforeSec = 59;
+		
+		var afterYear = currentdate.getFullYear();
+		var afterMonth = currentdate.getMonth()+1;
+		var afterDay = currentdate.getDate();
+		var afterHrs = 00;
+		var afterMin = 00;
+		var afterSec = 00;
+		
+		defaultBefore = convertEpoch(beforeYear,beforeMonth,beforeDay,beforeHrs,beforeMin,beforeSec); //1735145999;//
+		defaultAfter = convertEpoch(afterYear,afterMonth,afterDay,afterHrs,afterMin,afterSec);//1735059600;//
 		const response = await fetch(auth_exchange_for_accessToken_link,{
 			method: 'post',
 			headers: {
@@ -140,9 +165,9 @@ function show_recorded_activities(data){
 	
 	try{
 		var iCount=1;
-		var dataCum = "<table border='1'><thead><tr><th>No</th><th>Athlete Id</th> <th>Activity Id</th><th>Distance (m)</th><th>moving_time(s)</th><th>Average_speed(m/s)</th><th>start_date_local</th></tr></thead><tbody>";
+		var dataCum = "<table border='1'><thead><tr><th>No</th><th>Athlete Id</th> <th>Activity Id</th><th>Sports</th><th>Distance (m)</th><th>moving_time(s)</th><th>Average_speed(m/s)</th><th>start_date_local</th></tr></thead><tbody>";
 		for (const element of data) { // You can use `let` instead of `const` if you like
-			dataCum = dataCum+ "<tr><td>"+iCount+" </td><td> "+element["athlete"]["id"]+"</td> <td>"+element["id"]+"</td> <td>"+element["distance"]+"</td> <td>"+element["moving_time"]+"</td> <td>"+element["average_speed"]+"</td> <td>"+element["start_date_local"]+"</td></tr>";
+			dataCum = dataCum+ "<tr><td>"+iCount+" </td><td> "+element["athlete"]["id"]+"</td> <td>"+element["id"]+"</td><td>"+element["type"]+"</td><td>"+element["distance"]+"</td> <td>"+element["moving_time"]+"</td> <td>"+element["average_speed"]+"</td> <td>"+element["start_date_local"]+"</td></tr>";
             iCount++;
 		}
 		//console.log(dataCum);
