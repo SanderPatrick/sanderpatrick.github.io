@@ -12,52 +12,18 @@
   onclick="CapacityChart();"
 </form>!-->
 
-Client ID: <input type="text" value="144906" /> <input type="submit" value="Search" onclick="fetchAthleteInformation();">
-<a href="#">1.Sander Nguyen </a> | <a href="#" >2.Tommy Hoang </a> | <a href="#">3.Pepsi Nguyen</a> | <a href="#">4.Cindy Doan </a> | <a href="#">5.Ricky Nguyen</a>
+Client ID: <input type="text" value="144506" id='clientID' /> <input type="submit" value="Search" onclick="fetchAthleteInformation();">
+<!--<a href="#">1.Sander Nguyen </a> | <a href="#" >2.Tommy Hoang </a> | <a href="#">3.Pepsi Nguyen</a> | <a href="#">4.Cindy Doan </a> | <a href="#">5.Ricky Nguyen</a>
 </br>
-<a href="#">6.Anna Nguyen </a> | <a href="#" >7.Jenny Nguyen </a>	
+<a href="#">6.Anna Nguyen </a> | <a href="#" >7.Jenny Nguyen </a>	--!>
 <script src="https://apis.google.com/js/api.js"></script>
+//https://www.youtube.com/watch?v=ZdDB5VVW8HM
 <script>
-
-function fetchAthleteInformation(){
-	console.log("Starting get ClientID & SecretId...");
-	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0
-	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2
-	const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
-	const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
-	gSheetsURL = link2;
-	fetch(gSheetsURL).then(res => console.log(res.rows)
-			      
-			      
-			      );
-	
-	f_SyncInfo();
-	f_fetch_recorded_activities_by_range();
-}
-
-function f_SyncInfo(){
-	clientId='145417';//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
-	//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
-	clientSecret ='800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
-	returned_code ='837a3437b85f3d83962bfc7303b16f4de5bd42f3';
-	exchanged_refreshToken="a1ec96317f305c472315e303cafb024c0d096623";
-	exchanged_accessToken="";
-}
-
-function f_fetch_recorded_activities_by_range(){
-	exchange_auth_for_access_token();
-}
-	
-	
-//1. Authorize to get code
-var clientId ='144506'//'144906'
-var clientSecret ='bfc9734e06f811f73a09874f17bfc3680c655073'//'779aac7c5d65c3492a27047a191009118de05be6'
-const  auth_app_link ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=http://localhost/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
 //console.log(auth_app_link)
 //window.location.replace(auth_app_link)
-var returned_code ='34a2b2704d3d0f61d956bfa0c5af5a59fb0b6d24'//"83351f29cd2ef28c17d58b4f2e12418bacda6d1e" // obtaining from above redirect_uri http://localhost/exchange_token?state=&code=762d43d87868ec8265b2b406cd8f2e9386100aab&scope=read,activity:write,activity:read_all,profile:read_all,read_all
-var exchanged_accessToken="";
-var exchanged_refreshToken="b338caf77f29c616dba12213dde4c14c3dbfec56";
+var returned_code ='';//"83351f29cd2ef28c17d58b4f2e12418bacda6d1e" // obtaining from above redirect_uri http://localhost/exchange_token?state=&code=762d43d87868ec8265b2b406cd8f2e9386100aab&scope=read,activity:write,activity:read_all,profile:read_all,read_all
+var exchanged_accessToken='';
+var exchanged_refreshToken='';
 // exchange_token to get access_token
 
 const  auth_exchange_for_accessToken_link = "https://www.strava.com/oauth/token"
@@ -65,6 +31,75 @@ const  auth_exchange_for_accessToken_link = "https://www.strava.com/oauth/token"
 
 var defaultBefore;
 var defaultAfter;
+const spreadsheetId = '1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0'; // Replace with your spreadsheet ID
+    //const sheetName = 'tbl_exchange_tokens'; // Replace with your sheet name
+const googleSheetsApiKey='AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0'; // Replace with your API key
+	//1. Authorize to get code
+var clientId ='';//'144906'
+var clientSecret ='';//'779aac7c5d65c3492a27047a191009118de05be6'
+const  auth_app_link ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=http://localhost/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
+
+const auth_link = "https://www.strava.com/oauth/token"
+const authorizeLink ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=index.html/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
+//console.log(authorizeLink)
+//window.location.replace(authorizeLink);
+
+
+
+
+	
+function fetchAthleteInformation(){
+	console.log("Starting get ClientID & SecretId...");
+	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0
+	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2
+	//const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
+	//const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
+	//gSheetsURL = link2;
+	//fetch(gSheetsURL).then(res => console.log(res.text()));
+    
+
+   fetch('https://sheets.googleapis.com/v4/spreadsheets/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/values/tbl_exchange_tokens?key=AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0')
+        .then(response => response.json())
+        .then(data => f_SyncInfo(data.values)
+  )
+  .catch(error => console.error('Error:', error));;
+
+}
+
+function f_SyncInfo(data){
+    //console.log(data); 
+	const iCount = 0;
+	for (var i = 0; i < data.length; i++) {
+		console.log( i+ "--->"+data[i]);
+		var inputClientId = document.getElementById("clientID").value;
+		console.log( "inputClientId: "+inputClientId);
+		if	(data[i][2] == inputClientId){
+			clientId=data[i][2];//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
+			//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
+			clientSecret = data[i][3];//'800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
+			returned_code = data[i][4];//'837a3437b85f3d83962bfc7303b16f4de5bd42f3';
+			exchanged_refreshToken= data[i][6];//"a1ec96317f305c472315e303cafb024c0d096623";
+			exchanged_accessToken=data[i][5];//
+			break;
+		}
+		
+	}
+	f_fetch_recorded_activities_by_range();
+	
+	/*clientId='145417';//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
+	//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
+	clientSecret ='800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
+	returned_code ='837a3437b85f3d83962bfc7303b16f4de5bd42f3';
+	exchanged_refreshToken="a1ec96317f305c472315e303cafb024c0d096623";
+	exchanged_accessToken="";
+	*/
+}
+
+function f_fetch_recorded_activities_by_range(){
+	exchange_auth_for_access_token();
+}
+	
+	
 
 async function   exchange_auth_for_access_token(){
 	try{
@@ -146,10 +181,9 @@ function execute_auth(res){
 
 
 
-const auth_link = "https://www.strava.com/oauth/token"
 
 function getActivites(res){
-	var lastAccesToken ="a8286b988a8becb5176355a0b199d468f2d40d4c";
+	var lastAccesToken ="";
 	if(!res.errors)
       exchanged_accessToken=res.access_token;//"a8286b988a8becb5176355a0b199d468f2d40d4c";
 	else
@@ -183,6 +217,12 @@ function show_recorded_activities(data){
 
 }
 
+function insert_activities_toGsheet(){
+//https://sheets.googleapis.com/v4/spreadsheets/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/values/A2:G2:append?key=AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0
+
+
+}
+
 function reAuthorize(){
     fetch(auth_link,{
         method: 'post',
@@ -207,10 +247,6 @@ function reAuthorize(){
 
 //Sy
 
-const authorizeLink ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=index.html/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
-//console.log(authorizeLink)
-//window.location.replace(authorizeLink);
-
 
 function convertEpoch(iYear,iMoth,iDay,iHour,iMinute,iSecond){
 	var epochVal=iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond;
@@ -221,6 +257,33 @@ function convertEpoch(iYear,iMoth,iDay,iHour,iMinute,iSecond){
 	console.log(epochVal);
 	return epochVal;
 }
+
+
+
+// Google Sheets insert_activities_toGsheet
+function start() {
+        // Initializes the client with the API key and the Translate API.
+        gapi.client.init({
+          'apiKey': googleSheetsApiKey,
+          'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/translate/v2/rest'],
+        }).then(function() {
+          // Executes an API request, and returns a Promise.
+          // The method name `language.translations.list` comes from the API discovery.
+          return gapi.client.language.translations.list({
+            q: 'hello world',
+            source: 'en',
+            target: 'de',
+          });
+        }).then(function(response) {
+          console.log(response.result.data.translations[0].translatedText);
+        }, function(reason) {
+          console.log('Error: ' + reason.result.error.message);
+        });
+      };
+
+      // Loads the JavaScript client library and invokes `start` afterwards.
+//gapi.load('client', start);
+
 
 </script>
 
