@@ -138,9 +138,9 @@
           document.getElementById('content').innerText = 'No values found.';
           return;
         }
-		for (const element of response.values){
-		console.log(element);
-		}
+	        for (var i = 0; i < response.values.length; i++) {
+		      console.log(esponse.values[i]);
+		    }
         /*// Flatten to string to display
         const output = range.values.reduce(
             (str, row) => '${str}${row[2]}, ${row[2]}, ${row[4]}, ${row[6]}\n',
