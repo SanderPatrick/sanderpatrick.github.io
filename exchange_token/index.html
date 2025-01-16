@@ -142,6 +142,7 @@
             (str, row) => '${str}${row[2]}, ${row[2]}, ${row[4]}, ${row[6]}\n',
             'Client_id, Secret_id, author_code,refresh_code\n');
         document.getElementById('content').innerText = output;
+        console.log(range.values);
       }
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
