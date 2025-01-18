@@ -1,293 +1,369 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Sheets API Quickstart</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <p>Sheets API Quickstart</p>
 
-<body>
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <input type="submit" value="Refresh Strava' Authorization" onclick="fetch_author_code_of_clientId()" />
+     <!--Client ID: <input type="text" value="144506" id='clientID' /> <input type="submit" value="Sync" onclick="insert_activities_byClientId_toGsheet()" />
+     -->
+    </br>
+-----------------------------
+  </br>
+  <!-- Sander Nguyen	152581655	144506 |
+Pepsi Nguyen	1736941754	144906 |
+Tommy Hoang	154409230	145417 |
+Max Tran	153669108	145434 |
+Anna Nguyen	153071365	145501 |
+Jenny Nguyen	124103529	145502 |
+Xuan Dai	115072549	145430 |
+Cindy Nguyen	126789066	145503 |
+Alice Nguyen	153126320	145507 -->
+    <script type="text/javascript">
+      /* exported gapiLoaded */
+      /* exported gisLoaded */
+      /* exported handleAuthClick */
+      /* exported handleSignoutClick */
 
-<h1>SCRGer Running Summary</h1>
-<!-- <form action="">
-  <label for="fClientId">ClientId:</label>
-  <input type="text" id="fclient_id" name="fclient_id"><br><br>
-  <label for="lname">ClientSecretId:</label>
-  <input type="text" id="fclient_secret" name="fclient_secret"><br><br>
-  onclick="CapacityChart();"
-</form>!-->
+      // TODO(developer): Set to client ID and API key from the Developer Console
+      const CLIENT_ID = '564162611409-iqu3vmh7eosg2vg25pfbjt3fbbd9v5pf.apps.googleusercontent.com';
+      const API_KEY = 'AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0';
 
-Client ID: <input type="text" value="144506" id='clientID' /> <input type="submit" value="Search" onclick="fetchAthleteInformation();">
-<!--<a href="#">1.Sander Nguyen </a> | <a href="#" >2.Tommy Hoang </a> | <a href="#">3.Pepsi Nguyen</a> | <a href="#">4.Cindy Doan </a> | <a href="#">5.Ricky Nguyen</a>
-</br>
-<a href="#">6.Anna Nguyen </a> | <a href="#" >7.Jenny Nguyen </a>	--!>
-<script src="https://apis.google.com/js/api.js"></script>
-//https://www.youtube.com/watch?v=ZdDB5VVW8HM
-<script>
-//console.log(auth_app_link)
-//window.location.replace(auth_app_link)
-var returned_code ='';//"83351f29cd2ef28c17d58b4f2e12418bacda6d1e" // obtaining from above redirect_uri http://localhost/exchange_token?state=&code=762d43d87868ec8265b2b406cd8f2e9386100aab&scope=read,activity:write,activity:read_all,profile:read_all,read_all
-var exchanged_accessToken='';
-var exchanged_refreshToken='';
-// exchange_token to get access_token
+      // Discovery doc URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
-const  auth_exchange_for_accessToken_link = "https://www.strava.com/oauth/token"
-//?client_id=144906&client_secret=5a0e54a5a4d2ef1b2a56b8a7da42f39856498ee7&code=fa28fe3cda19ec4aa51eff7fff8002233d55cdc3&grant_type=authorization_code"
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
-var defaultBefore;
-var defaultAfter;
-const spreadsheetId = '1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0'; // Replace with your spreadsheet ID
-    //const sheetName = 'tbl_exchange_tokens'; // Replace with your sheet name
-const googleSheetsApiKey='AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0'; // Replace with your API key
-	//1. Authorize to get code
-var clientId ='';//'144906'
-var clientSecret ='';//'779aac7c5d65c3492a27047a191009118de05be6'
-const  auth_app_link ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=http://localhost/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
-
-const auth_link = "https://www.strava.com/oauth/token"
-const authorizeLink ="https://www.strava.com/oauth/authorize?client_id="+clientId+"&response_type=code&redirect_uri=index.html/exchange_token&scope=read_all,activity:write,activity:read_all,profile:read_all&approval_prompt=auto"
-//console.log(authorizeLink)
-//window.location.replace(authorizeLink);
-
-
-
-
-	
-function fetchAthleteInformation(){
-	console.log("Starting get ClientID & SecretId...");
-	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0
-	//https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2
-	//const link1="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?tqx=out:csv&sheet=tbl_exchange_tokens&range=A1:F2"
-	//const link2="https://docs.google.com/spreadsheets/d/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/gviz/tq?sheet=tbl_exchange_tokens&range=A1:F2"
-	//gSheetsURL = link2;
-	//fetch(gSheetsURL).then(res => console.log(res.text()));
-    
-
-   fetch('https://sheets.googleapis.com/v4/spreadsheets/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/values/tbl_exchange_tokens?key=AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0')
-        .then(response => response.json())
-        .then(data => f_SyncInfo(data.values)
-  )
-  .catch(error => console.error('Error:', error));;
-
-}
-
-function f_SyncInfo(data){
-    //console.log(data); 
-	const iCount = 0;
-	for (var i = 0; i < data.length; i++) {
-		console.log( i+ "--->"+data[i]);
-		var inputClientId = document.getElementById("clientID").value;
-		console.log( "inputClientId: "+inputClientId);
-		if	(data[i][2] == inputClientId){
-			clientId=data[i][2];//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
-			//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
-			clientSecret = data[i][3];//'800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
-			returned_code = data[i][4];//'837a3437b85f3d83962bfc7303b16f4de5bd42f3';
-			exchanged_refreshToken= data[i][6];//"a1ec96317f305c472315e303cafb024c0d096623";
-			exchanged_accessToken=data[i][5];//
-			break;
-		}
-		
-	}
-	f_fetch_recorded_activities_by_range();
-	
-	/*clientId='145417';//144906	779aac7c5d65c3492a27047a191009118de05be6	78d8de4983b2cbd8c3b03b507f468cb136a43375
-	//145417	800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e	837a3437b85f3d83962bfc7303b16f4de5bd42f3		a1ec96317f305c472315e303cafb024c0d096623
-	clientSecret ='800ffada0dd4b6b76fcd3ffd21dcf81577e01b9e';
-	returned_code ='837a3437b85f3d83962bfc7303b16f4de5bd42f3';
-	exchanged_refreshToken="a1ec96317f305c472315e303cafb024c0d096623";
-	exchanged_accessToken="";
-	*/
-}
-
-function f_fetch_recorded_activities_by_range(){
-	exchange_auth_for_access_token();
-}
-	
-	
-
-async function   exchange_auth_for_access_token(){
-	try{
-		//2024-12-25T14:43:46Z
-		//console.log(Date.parse("2024-12-25T14:43:46Z"));
-	   var currentdate = new Date(); 
-       var datetime = "Last Sync: " + currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/" 
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
-		console.log(datetime);
-		var beforeYear = currentdate.getFullYear();
-		var beforeMonth = currentdate.getMonth()+1;
-		var beforeDay = currentdate.getDate();
-		var beforeHrs = 23;
-		var beforeMin = 59;
-		var beforeSec = 59;
-		
-		var afterYear = currentdate.getFullYear();
-		var afterMonth = currentdate.getMonth()+1;
-		var afterDay = currentdate.getDate();
-		var afterHrs = 00;
-		var afterMin = 00;
-		var afterSec = 00;
-		
-		defaultBefore = convertEpoch(beforeYear,beforeMonth,beforeDay,beforeHrs,beforeMin,beforeSec); //1735145999;//
-		defaultAfter = convertEpoch(afterYear,afterMonth,afterDay,afterHrs,afterMin,afterSec);//1735059600;//
-		const response = await fetch(auth_exchange_for_accessToken_link,{
-			method: 'post',
-			headers: {
-				'Accept': 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-
-			},
-
-			body: JSON.stringify({
-
-				client_id: clientId,
-				client_secret: clientSecret,
-				code: returned_code,
-				grant_type: 'authorization_code'
-			})
-		}).then(res => res.json()).then(res => execute_auth(res)) 
-	   
-		
-	}catch(error){
-		console.log(error.message);
-	}
-	
-	
-}
-function execute_auth(res){
-	if(res["access_token"]){
-		//if(res["access_token"]!="undefined"){
-					exchanged_accessToken = res["access_token"];
-					exchanged_refreshToken = res["refresh_token"];
-					console.log(exchanged_accessToken+'\n');
-					console.log(exchanged_refreshToken);
-		//}else{
-		//			reAuthorize();
-		//}
-				
-				//console.log("Success:", response.json());
-			
-				//var exchanged_accessToken = response["access_token"];
-				//var exchanged_refreshToken = response["refresh_token"];
-				//console.log(exchanged_accessToken+'\n');
-				//console.log(exchanged_refreshToken);
-				reAuthorize();
-	}
-	else{
-		//console.log(res.status);
-		reAuthorize();
-	}
-}
+      // Strava link
+      const strava_auth_refresh_link = "https://www.strava.com/oauth/token"
+      var strava_clientId='';
+      var strava_secretId='';
+      var strava_refresh_code='';
+      var strava_author_code='';
 
 
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+      let g_token='defaultToken';
+      let g_Cookies;
 
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
 
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
 
-function getActivites(res){
-	var lastAccesToken ="";
-	if(!res.errors)
-      exchanged_accessToken=res.access_token;//"a8286b988a8becb5176355a0b199d468f2d40d4c";
-	else
-	  exchanged_accessToken=lastAccesToken;
-    //const activities_link = "https://www.strava.com/api/v3/athlete/activities?before=1736546425&after=1736373625&page=1&per_page=100&access_token=e09d2aa33b6574ffcbf85baf74a7bcc2455d549b";
-	const activities_link = "https://www.strava.com/api/v3/athlete/activities?before="+defaultBefore+"&after="+defaultAfter+"&page=1&per_page=200&access_token="+exchanged_accessToken;
-	
-	console.log(activities_link);
-    
-	fetch(activities_link).then(res => res.json())
-		.then((data) => show_recorded_activities(data)
-		)
-}
-
-function show_recorded_activities(data){
-	
-	try{
-		var iCount=1;
-		var dataCum = "<table border='1'><thead><tr><th>No</th><th>Athlete Id</th> <th>Activity Id</th><th>Sports</th><th>Distance (m)</th><th>moving_time(s)</th><th>Average_speed(m/s)</th><th>start_date_local</th></tr></thead><tbody>";
-		for (const element of data) { // You can use `let` instead of `const` if you like
-			dataCum = dataCum+ "<tr><td>"+iCount+" </td><td> "+element["athlete"]["id"]+"</td> <td>"+element["id"]+"</td><td>"+element["type"]+"</td><td>"+element["distance"]+"</td> <td>"+element["moving_time"]+"</td> <td>"+element["average_speed"]+"</td> <td>"+element["start_date_local"]+"</td></tr>";
-            iCount++;
-		}
-		//console.log(dataCum);
-		dataCum=dataCum+"</tbody></table>";
-		document.getElementById('showDiv').innerHTML = dataCum;
-		console.log(data);
-	}catch(err){
-		console.log(err.message+"  aaaaaaaaaaaaaaaa");
-	}
-
-}
-
-function insert_activities_toGsheet(){
-//https://sheets.googleapis.com/v4/spreadsheets/1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0/values/A2:G2:append?key=AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0
-
-
-}
-
-function reAuthorize(){
-    fetch(auth_link,{
-        method: 'post',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-
-        },
-
-        body: JSON.stringify({
-
-            client_id: clientId,
-		    client_secret: clientSecret,
-            refresh_token: exchanged_refreshToken,//'b338caf77f29c616dba12213dde4c14c3dbfec56',
-            grant_type: 'refresh_token'
-        })
-    }).then(res => res.json())
-        .then(res => getActivites(res))  
-}
-
-//reAuthorize()
-
-//Sy
-
-
-function convertEpoch(iYear,iMoth,iDay,iHour,iMinute,iSecond){
-	var epochVal=iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond;
-	var inputDate = new Date(iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond+"").toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
-	//console.log(inputDate);
-	
-    epochVal = Date.parse(inputDate)/1000;//= Math.floor(inputDate / 1000);
-	console.log(epochVal);
-	return epochVal;
-}
-
-
-
-// Google Sheets insert_activities_toGsheet
-function start() {
-        // Initializes the client with the API key and the Translate API.
-        gapi.client.init({
-          'apiKey': googleSheetsApiKey,
-          'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/translate/v2/rest'],
-        }).then(function() {
-          // Executes an API request, and returns a Promise.
-          // The method name `language.translations.list` comes from the API discovery.
-          return gapi.client.language.translations.list({
-            q: 'hello world',
-            source: 'en',
-            target: 'de',
-          });
-        }).then(function(response) {
-          console.log(response.result.data.translations[0].translatedText);
-        }, function(reason) {
-          console.log('Error: ' + reason.result.error.message);
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: 'AIzaSyDVg599KGl9G4xNce2QmYNqBMLnlCHXDw0',
+          discoveryDocs: [DISCOVERY_DOC],
         });
-      };
+        gapiInited = true;
+        maybeEnableButtons();
+      }
 
-      // Loads the JavaScript client library and invokes `start` afterwards.
-//gapi.load('client', start);
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: '564162611409-iqu3vmh7eosg2vg25pfbjt3fbbd9v5pf.apps.googleusercontent.com',
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          g_token = gapi.client.getToken();
+          
+
+        };
+
+        if (gapi.client.getToken() === null) {
+          // Prompt the user to select a Google Account and ask for consent to share their data
+          // when establishing a new session.
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          // Skip display of account chooser and consent dialog for an existing session.
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+		
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          gapi.client.setToken('');
+          document.getElementById('content').innerText = '';
+          document.getElementById('authorize_button').innerText = 'Authorize';
+          document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+      /**
+       * Print the names and majors of students in a sample spreadsheet:
+       * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+       */
+
+ async function fetch_author_code_of_clientId() {
+        let response;
+        document.cookie = g_token.access_token;
+        str_access_token_list="";//clear data
+        //document.cookie = "1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0";
+        //console.log("cookie:"+document.cookie);
+        try {
+          response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0',
+            range: 'tbl_exchange_tokens!A2:I25',
+          });
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+		
+        const range = response.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('content').innerText = 'No values found.';
+          return;
+        }
+        
+        var clientInfo=[];
+        var syncing_clientId ='';
+        for (let i = 0; i < range.values.length; i++) {
+         
+            strava_clientName = range.values[i][0];
+            strava_clientId=range.values[i][2];
+            strava_secretId=range.values[i][3];
+            strava_refresh_code=range.values[i][6];
+            strava_author_code=range.values[i][4];
+            //refresh_authorization(strava_clientId,strava_secretId,strava_refresh_code);
+            syncing_clientId= syncing_clientId+''+ strava_clientName+'--> Client ID--> <input type="text" value="'+strava_clientId+'_'+strava_secretId+'_'+strava_refresh_code+'" id="clientID_'+strava_clientId+'" disabled:true /> <input type="submit" value="Sync" onclick="insert_activities_byClientId_toGsheet('+strava_clientId+');this.disabled = true;" /> <div id="div1" style="display:none">Syncing ...</div> </br>';
+            //setTimeout(() => refresh_authorization(strava_clientId,strava_secretId,strava_refresh_code), 3000 * start);
+            //setTimeout(() => refresh_authorization(strava_clientId,strava_secretId,strava_refresh_code), 10000);
+          }
+        //console.log("syncing_clientId: "+syncing_clientId);
+        document.getElementById('showDiv').innerHTML = syncing_clientId;
+      
+    }
+  //  alert('hi');
+
+  
+    //String of authorized code
+    var str_access_token_list ="";
+    async function refresh_authorization(i_client_id,i_secret_id,i_refresh_code){
+        const response = "";
+        //console.log(new Date().toISOString());
+        //refresh strava access_token
+        await fetch(strava_auth_refresh_link,{
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json, text/plain, */*',
+                            'Content-Type': 'application/json'
+
+                        },
+
+                        body: JSON.stringify({
+
+                            client_id: i_client_id,
+                            client_secret: i_secret_id,
+                            refresh_token: i_refresh_code,//'b338caf77f29c616dba12213dde4c14c3dbfec56',
+                            grant_type: 'refresh_token'
+                        })
+                        }
+            ).then(res => res.json()).then( res => //console.log(i_client_id+" is refreshed with  access_token: "+res["access_token"]),
+            str_access_token_list= str_access_token_list + '{"clientId":"'+i_client_id+'","access_token":"'+res["access_token"]+'"},'
+        ).then(res => console.log("str_access_token_list:"+str_access_token_list));
+
+
+    }
+
+    async function insert_activities_byClientId_toGsheet(i_clientId){
+        //var inputClientId = document.getElementById("clientID").value;
+		   //console.log( "inputClientId by Click: "+str_access_token_list);
+
+       var inputClientId = document.getElementById("clientID_"+i_clientId).value;
+       
+        //console.log(inputClientId);
+        const clientSplitData = inputClientId.split("_");
+        await refresh_authorization(i_clientId,clientSplitData[1],clientSplitData[2]);
+
+        //console.log("setTimeout: "+clientSplitData);
+
+        //
+        let str = '['+str_access_token_list.slice(0, -1)+"]"; 
+        var json_access_token_list="";
+        //console.log("str:"+str);
+        try{
+          //let tmpStr = JSON.stringify(str);
+          json_access_token_list= JSON.parse(str);
+        }catch(err){
+          console.log("insert_activities_byClientId_toGsheet JSON.parse(str) error: "+err.message);
+          return;
+        }
+        //console.log("json_access_token_list: "+json_access_token_list);
+
+
+        var filtered_client_access_token = json_access_token_list.filter( function(obj, index){
+          return obj.clientId==i_clientId; 
+        });
+        if (filtered_client_access_token.length<1)
+        {
+          console.log(new Date().toISOString()+"filtered_client_access_token error:filtered_client_access_token.length --> "+filtered_client_access_token.length);
+          return;
+        }
+        //console.log(filtered_client_access_token[0]["clientId"]+'-->'+ filtered_client_access_token[0]["access_token"]);
+        //Get activities all
+        //1737219599 = 2025-01-18 23:59:59 
+        //1735664400 = 2025-01-01 00:00:00 
+        //console.log("convertEpoch(2025,1,18,23,59,59): "+convertEpoch(2025,1,18,23,59,59)); --> before
+        //console.log("convertEpoch(2025,1,1,0,0,0): "+convertEpoch(2025,1,1,0,0,0)); --> after
+        var myDateTime = new Date(); 
+        // var datetime = "Last Sync: " + myDateTime.getDate() + "/"
+        //          + (myDateTime.getMonth()+1)  + "/" 
+        //          + myDateTime.getFullYear() + " @ "  
+        //        + myDateTime.getHours() + ":"  
+        //         + myDateTime.getMinutes() + ":" 
+        //         + myDateTime.getSeconds();
+        var offsetDays =0; // set the duration of time to query activities
+
+        var epochYearBefore =myDateTime.getFullYear();
+        var epochMonthBefore =(myDateTime.getMonth()+1);
+        var epochDayBefore =myDateTime.getDate();
+        myDateTime = new Date(myDateTime.setDate(myDateTime.getDate() - offsetDays));
+        console.log("myDateTime:"+myDateTime);
+
+        var epochYearAfter = myDateTime.getFullYear();// myDateTime.getFullYear();
+        var epochMonthAfter = new Date(new Date().setMonth(myDateTime.getMonth())).getMonth()+1; //myDateTime.getMonth()-offsetMonths;//(myDateTime.getMonth()+1);
+        var epochDayAfter =new Date(new Date().setDate(myDateTime.getDate())).getDate();
+
+        console.log("defaultBefore:"+epochYearBefore+"/"+epochMonthBefore+"/"+epochDayBefore+" 23:59:59 ");
+        console.log("defaultAfter:"+epochYearAfter+"/"+epochMonthAfter+"/"+epochDayAfter+" 00:00:00");
+
+        var defaultBefore = convertEpoch(epochYearBefore,epochMonthBefore,epochDayBefore,23,59,59);
+        var defaultAfter = convertEpoch(epochYearAfter,epochMonthAfter,epochDayAfter,0,0,0,0);
+        //const activities_link = "https://www.strava.com/api/v3/athlete/activities?before=1737219599&after=1735664400&page=1&per_page=200&access_token="+filtered_client_access_token[0]["access_token"];
+
+        const activities_link = "https://www.strava.com/api/v3/athlete/activities?before="+defaultBefore+"&after="+defaultAfter+"&page=1&per_page=200&access_token="+filtered_client_access_token[0]["access_token"];
+        console.log(activities_link);
+
+        fetch(activities_link).then(res => res.json())
+        .then((data) => //console.log(data),//fetch_lastIndex_row_of_activities(data)
+             append_activities(data)
+            )
+    }
+    async function append_activities(data){
+        
+        // Insert batch to tbl_all_activities
+        // initial arr to store activities
+        if (data.length<1){
+          console.log("append_activities data invalid: data.length = "+data.length);
+          return;
+        }
+
+        let insert_values = [];
+        for (var i = 0; i < data.length; i++) {
+          insert_values[i]=[];
+        }
+        
+        // fetch activities into arr
+        var iCount = 0;
+        for (const element of data) { // You can use `let` instead of `const` if you like 
+          insert_values[iCount][0]=element["athlete"]["id"];
+          insert_values[iCount][1]=element["id"];
+          insert_values[iCount][2]=element["distance"];
+          insert_values[iCount][3]=element["moving_time"];
+          insert_values[iCount][4]=element["average_speed"];
+          insert_values[iCount][5]=element["start_date_local"];
+          insert_values[iCount][6]=element["type"];
+          iCount++;
+        }
+        //console.log("insert_values length: "+insert_values.length);
+        const body = {
+          values: insert_values,
+        };
+       // console.log('values.append body: '+body);
+       // Append activities into gsheets
+        try {
+          gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: '1Z24WstosZzaStOMOypVf1nzXv_R4na2-F39GfFo-8H0',
+            range: 'A:G',
+            //resource: requestJson,
+            valueInputOption: 'USER_ENTERED',
+            resource: body,
+          }).then((response) => {
+            const result = response.result;
+            console.log(`${result.updates.updatedCells} cells appended.`);
+            //if (callback) callback(response);
+          });
+        } catch (err) {
+          console.log('values.append err: '+err.message);
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+
+    }
+
+    function convertEpoch(iYear,iMoth,iDay,iHour,iMinute,iSecond){
+      var epochVal=iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond;
+      var inputDate = new Date(iYear+"/"+iMoth+"/"+iDay+" "+iHour+":"+iMinute+":"+iSecond+"").toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+      //console.log(inputDate);
+      
+        epochVal = Date.parse(inputDate)/1000;//= Math.floor(inputDate / 1000);
+      console.log(epochVal);
+      return epochVal;
+    }
+
+
+
 
 
 </script>
 
-<div id="showDiv"></>
-</body>
 
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
+<div id="showDiv" > </div>
+</body>
 </html>
