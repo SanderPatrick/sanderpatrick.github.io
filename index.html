@@ -265,7 +265,7 @@ Alice Nguyen	153126320	145507 -->
         //        + myDateTime.getHours() + ":"  
         //         + myDateTime.getMinutes() + ":" 
         //         + myDateTime.getSeconds();
-        var offsetDays =0; // set the duration of time to query activities
+        var offsetDays =6; // set the duration of time to query activities
 
         var epochYearBefore =myDateTime.getFullYear();
         var epochMonthBefore =(myDateTime.getMonth()+1);
@@ -314,7 +314,7 @@ Alice Nguyen	153126320	145507 -->
           insert_values[iCount][2]=element["distance"];
           insert_values[iCount][3]=element["moving_time"];
           insert_values[iCount][4]=element["average_speed"];
-          insert_values[iCount][5]=element["start_date_local"];
+          insert_values[iCount][5]=element["start_date_local"].replace("T"," ").replace("Z","");
           insert_values[iCount][6]=element["type"];
           iCount++;
         }
@@ -333,7 +333,7 @@ Alice Nguyen	153126320	145507 -->
             resource: body,
           }).then((response) => {
             const result = response.result;
-            console.log(`${result.updates.updatedCells} cells appended.`);
+            console.log(`${result.updates.updatedRows} rows appended.`);
             //if (callback) callback(response);
           });
         } catch (err) {
